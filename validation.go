@@ -11,8 +11,9 @@ type Validator interface {
 
 //ValidatorSettings describe validation behavior
 type ValidatorSettings struct {
-	CheckFieldsOutOfOrder bool
-	RejectInvalidMessage  bool
+	CheckFieldsOutOfOrder    bool
+	RejectInvalidMessage     bool
+	ValidateFieldsHaveValues bool
 }
 
 //Default configuration for message validation.
@@ -121,14 +122,15 @@ func validateFIXT(transportDD, appDD *datadictionary.DataDictionary, settings Va
 		}
 	}
 
-	if err := validateWalk(transportDD, appDD, msgType, msg); err != nil {
-		return err
-	}
+	if settings.RejectInvalidMessage {
+		if err := validateWalk(transportDD, appDD, msgType, msg); err != nil {
+			return err
+		}
 
-	if err := validateFields(transportDD, appDD, msgType, msg); err != nil {
-		return err
+		if err := validateFields(transportDD, appDD, msgType, msg); err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
